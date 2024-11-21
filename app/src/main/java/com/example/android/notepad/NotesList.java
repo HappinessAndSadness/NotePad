@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2007 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.example.android.notepad;
 
 import com.example.android.notepad.NotePad;
@@ -39,25 +23,17 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
-/**
- * Displays a list of notes. Will display notes from the {@link Uri}
- * provided in the incoming Intent if there is one, otherwise it defaults to displaying the
- * contents of the {@link NotePadProvider}.
- * <p>
- * NOTE: Notice that the provider operations in this Activity are taking place on the UI thread.
- * This is not a good practice. It is only done here to make the code more readable. A real
- * application should use the {@link android.content.AsyncQueryHandler} or
- * {@link android.os.AsyncTask} object to perform operations asynchronously on a separate thread.
- */
 public class NotesList extends ListActivity {
-
-    // For logging and debugging
+    private MyCursorAdapter adapter;
+    private Cursor cursor;
+    private String[] dataColumns = {NotePad.Notes.COLUMN_NAME_TITLE, NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE};
+    private int[] viewIDs = {android.R.id.text1, R.id.text2};
     private static final String TAG = "NotesList";
 
     /**
      * The columns needed by the cursor adapter
      */
-    private static final String[] PROJECTION = new String[] {
+    private static final String[] PROJECTION = new String[]{
             NotePad.Notes._ID, // 0
             NotePad.Notes.COLUMN_NAME_TITLE, // 1
             //Extended:display time, color
@@ -100,19 +76,7 @@ public class NotesList extends ListActivity {
          */
         getListView().setOnCreateContextMenuListener(this);
 
-        /* Performs a managed query. The Activity handles closing and requerying the cursor
-         * when needed.
-         *
-         * Please see the introductory note about performing provider operations on the UI thread.
-         */
-        Cursor cursor = managedQuery(
-                getIntent().getData(),            // Use the default content URI for the provider.
-                PROJECTION,                       // Return the note ID and title for each note.
-                null,                             // No where clause, return all records.
-                null,                             // No where clause, therefore no where column values.
-                NotePad.Notes.DEFAULT_SORT_ORDER  // Use the default sort order.
-        );
-
+        Cursor cursor = getContentResolver().query(getIntent().getData(), PROJECTION, null, null, NotePad.Notes.DEFAULT_SORT_ORDER);
         /*
          * The following two arrays create a "map" between columns in the cursor and view IDs
          * for items in the ListView. Each element in the dataColumns array represents
@@ -124,8 +88,6 @@ public class NotesList extends ListActivity {
         // The names of the cursor columns to display in the view, initialized to the title column
         final String[] dataColumns = {NotePad.Notes.COLUMN_NAME_TITLE, NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE};
         int[] viewIDs = {android.R.id.text1, R.id.text2};
-
-//        // Creates the backing adapter for the ListView.
 //        SimpleCursorAdapter adapter
 //            = new SimpleCursorAdapter(
 //                      this,                             // The Context for the ListView
@@ -134,7 +96,6 @@ public class NotesList extends ListActivity {
 //                      dataColumns,
 //                      viewIDs
 //              );
-        //Modify to a custom adapter that can be filled with color. The custom code is in MyCursorAdapter.java
         MyCursorAdapter adapter = new MyCursorAdapter(
                 this,
                 R.layout.noteslist_item,
@@ -276,28 +237,66 @@ public class NotesList extends ListActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_add:
-                /*
-                 * Launches a new Activity using an Intent. The intent filter for the Activity
-                 * has to have action ACTION_INSERT. No category is set, so DEFAULT is assumed.
-                 * In effect, this starts the NoteEditor Activity in NotePad.
-                 */
                 startActivity(new Intent(Intent.ACTION_INSERT, getIntent().getData()));
                 return true;
             case R.id.menu_paste:
-                /*
-                 * Launches a new Activity using an Intent. The intent filter for the Activity
-                 * has to have action ACTION_PASTE. No category is set, so DEFAULT is assumed.
-                 * In effect, this starts the NoteEditor Activity in NotePad.
-                 */
                 startActivity(new Intent(Intent.ACTION_PASTE, getIntent().getData()));
                 return true;
             case R.id.menu_search:
-                //Find function
-                //startActivity(new Intent(Intent.ACTION_SEARCH, getIntent().getData()));
                 Intent intent = new Intent(this, NoteSearch.class);
                 this.startActivity(intent);
                 return true;
-
+            case R.id.menu_sort1:
+                cursor = managedQuery(
+                        getIntent().getData(),
+                        PROJECTION,
+                        null,
+                        null,
+                        NotePad.Notes._ID
+                );
+                adapter = new MyCursorAdapter(
+                        this,
+                        R.layout.noteslist_item,
+                        cursor,
+                        dataColumns,
+                        viewIDs
+                );
+                setListAdapter(adapter);
+                return true;
+            case R.id.menu_sort2:
+                cursor = managedQuery(
+                        getIntent().getData(),
+                        PROJECTION,
+                        null,
+                        null,
+                        NotePad.Notes.DEFAULT_SORT_ORDER
+                );
+                adapter = new MyCursorAdapter(
+                        this,
+                        R.layout.noteslist_item,
+                        cursor,
+                        dataColumns,
+                        viewIDs
+                );
+                setListAdapter(adapter);
+                return true;
+            case R.id.menu_sort3:
+                cursor = managedQuery(
+                        getIntent().getData(),
+                        PROJECTION,
+                        null,
+                        null,
+                        NotePad.Notes.COLUMN_NAME_BACK_COLOR
+                );
+                adapter = new MyCursorAdapter(
+                        this,
+                        R.layout.noteslist_item,
+                        cursor,
+                        dataColumns,
+                        viewIDs
+                );
+                setListAdapter(adapter);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
