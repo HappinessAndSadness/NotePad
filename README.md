@@ -1,5 +1,6 @@
 ## Android期中实验
-本实验使用的JDK版本为corretto-11.0.25，gradle版本为6.7.1
+本实验是基于NotePad应用实现基本功能以及功能扩展。
+此实验使用的JDK版本为corretto-11.0.25，gradle版本为6.7.1。
 
 ### 项目主要结构
 #### 主要的类
@@ -65,6 +66,7 @@ list_options_menu.xml 笔记主页操作的菜单布局
     <string name="nothing_to_save">There is nothing to save</string>
 </resources>
 ```
+## 基本功能
 ### 1. `NoteList界面中笔记条目增加时间戳显示`
 #### 1.1
 修改NotesList.java中PROJECTION的内容，添加NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE字段，使其能读取修改时间的字段。
@@ -284,6 +286,7 @@ public class NoteSearch extends Activity implements SearchView.OnQueryTextListen
 
 ![Alt Text](./03.png)
 
+## 功能扩展
 ### 3.  `UI美化`
 #### 3.1
 在NotePad.java中添加新的字段。
