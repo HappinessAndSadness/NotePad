@@ -2,6 +2,12 @@
 本实验是基于NotePad应用实现基本功能以及功能扩展。
 此实验使用的JDK版本为corretto-11.0.25，gradle版本为6.7.1。
 
+其中完成了两项基本功能和两项功能扩展，如下：
+1.NoteList界面中笔记条目增加时间戳显示
+2.添加笔记查询功能（根据标题或内容查询）
+3.UI美化
+4.笔记排序
+
 ### 项目主要结构
 #### 主要的类
 MyCursorAdapter类 继承SimpleCursorAdapter
