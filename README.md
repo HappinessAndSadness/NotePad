@@ -290,6 +290,8 @@ public class NoteSearch extends Activity implements SearchView.OnQueryTextListen
 
 ![Alt Text](./02.png)
 
+（这里是根据内容查询）
+
 ![Alt Text](./03.png)
 
 ## 功能扩展
