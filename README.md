@@ -5,7 +5,7 @@
 其中完成了两项基本功能和两项功能扩展，如下：
 1.NoteList界面中笔记条目增加时间戳显示
 2.添加笔记查询功能（根据标题或内容查询）
-3.UI美化
+3.笔记颜色更换
 4.笔记排序
 
 ### 项目主要结构
@@ -75,7 +75,7 @@ list_options_menu.xml 笔记主页操作的菜单布局
 ## 基本功能
 ### 1. `NoteList界面中笔记条目增加时间戳显示`
 #### 1.1
-修改NotesList.java中PROJECTION的内容，添加NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE字段，使其能读取修改时间的字段。
+修改NotesList.java中PROJECTION的内容，添加NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE字段，使其能读取修改后的时间字段。
 ```properties
 private static final String[] PROJECTION = new String[] {
             NotePad.Notes._ID,
@@ -84,13 +84,13 @@ private static final String[] PROJECTION = new String[] {
     };
 ```
 #### 1.2
-修改NotesList.java中适配器的内容，将NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE装配到dataColumns中，同时viewIDs中也要增加一个文本框R.id.text2来存放时间。
+修改NotesList.java中适配器的内容，将NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE装配到dataColumns中，同时viewIDs中也要增加一个文本框R.id.text2来存放时间字段。
 ```properties
         final String[] dataColumns = {NotePad.Notes.COLUMN_NAME_TITLE, NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE};
         int[] viewIDs = {android.R.id.text1, R.id.text2};
 ```
 #### 1.3
-修改layout文件夹中noteslist_item.xml的内容，添加一个TextView组件，同时，还要注意他们的位置顺序与布局。
+修改layout文件夹中noteslist_item.xml的内容，添加一个TextView组件，同时，还要注意他们的位置顺序与界面布局。
 ```properties
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -120,7 +120,7 @@ private static final String[] PROJECTION = new String[] {
 </LinearLayout>
 ```
 #### 1.4
-修改NoteEditor.java中updateNote方法中的时间类型，记得把时区转为东八区。
+修改NoteEditor.java中updateNote方法中的时间类型，记得用setTimeZone把时区转为东八区的时间。
 ```properties
 private void updateNote(String text, String title) {
         ContentValues values = new ContentValues();
@@ -155,7 +155,7 @@ private void updateNote(String text, String title) {
 
 ### 2. `添加笔记查询功能（根据标题或内容查询）`
 #### 2.1
-修改menu文件夹中list_options_menu.xml的内容，在布局文件中添加搜索功能的图标。
+修改menu文件夹中list_options_menu.xml的内容，在布局文件中添加搜索功能的图标，这个图标是软件自带的，不需要外部导入。
 ```properties
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
@@ -178,7 +178,7 @@ private void updateNote(String text, String title) {
 </menu>
 ```
 #### 2.2
-在layout文件夹中，新建一个查找笔记内容的布局文件note_search.xml，要注意SearchView要在ListView之前。
+在layout文件夹中，新建一个查找笔记内容的布局文件note_search.xml，要注意SearchView要在ListView之前，不然搜索的内容会在输入框之上。
 ```properties
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -199,7 +199,7 @@ private void updateNote(String text, String title) {
 </LinearLayout>
 ```
 #### 2.3
-修改NotesList.java中的onOptionsItemSelected方法，在里面添加相关的查询处理功能。
+修改NotesList.java中的onOptionsItemSelected方法，在里面添加相关的查询处理功能，其实就是多了个case选项。
 ```properties
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -280,7 +280,7 @@ public class NoteSearch extends Activity implements SearchView.OnQueryTextListen
 }
 ```
 #### 2.5
-在AndroidManifest.xml里面添加NoteSearch的活动。
+在AndroidManifest.xml里面添加NoteSearch的活动，这样才能实现搜索功能。
 ```properties
         <activity
             android:name=".NoteSearch"
@@ -293,9 +293,9 @@ public class NoteSearch extends Activity implements SearchView.OnQueryTextListen
 ![Alt Text](./03.png)
 
 ## 功能扩展
-### 3.  `UI美化`
+### 3.  `笔记颜色更改`
 #### 3.1
-在NotePad.java中添加新的字段。
+在NotePad.java中添加新的颜色字段。
 ```properties
         public static final String COLUMN_NAME_BACK_COLOR = "color";
         public static final int DEFAULT_COLOR = 0;
@@ -320,7 +320,7 @@ public class NoteSearch extends Activity implements SearchView.OnQueryTextListen
        }
 ```
 #### 3.3
-在NotePadProvider.java中添加对其相应的处理代码
+在NotePadProvider.java中添加对其相应的处理方法，
 ```properties
     static {
         sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -345,6 +345,7 @@ public class NoteSearch extends Activity implements SearchView.OnQueryTextListen
             LiveFolders.NAME);
     }
 ```
+以及刚开始启动时的默认属性。
 ```properties
     @Override
     public Uri insert(Uri uri, ContentValues initialValues) {
@@ -386,7 +387,7 @@ public class NoteSearch extends Activity implements SearchView.OnQueryTextListen
     }
 ```
 #### 3.4
-新建一个MyCursorAdapter.java类，继承SimpleCursorAdapter，将颜色填充到ListView。
+新建一个MyCursorAdapter.java类，继承SimpleCursorAdapter，将颜色填充到ListView中。
 ```properties
 package com.example.android.notepad;
 
@@ -460,7 +461,7 @@ public class MyCursorAdapter extends SimpleCursorAdapter {
         );
 ```
 #### 3.6
-在menu文件夹中的editor_options_menu.xml中添加一个更改背景的功能选项图标。
+在menu文件夹中的editor_options_menu.xml中添加一个更改背景的功能选项图标，这个项目里是有的。
 ```properties
     <item android:id="@+id/menu_color"
         android:title="@string/menu_color"
@@ -468,7 +469,7 @@ public class MyCursorAdapter extends SimpleCursorAdapter {
         android:showAsAction="always"/>
 ```
 #### 3.7
-在NoteEditor.java中的onOptionsItemSelected方法的switch中添加颜色选项。
+在NoteEditor.java中的onOptionsItemSelected方法的switch中添加选择颜色的选项。
 ```properties
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -501,7 +502,7 @@ public class MyCursorAdapter extends SimpleCursorAdapter {
     }
 ```
 #### 3.8
-在layout文件夹中，新建布局文件note_color.xml，垂直线性布局放置5个ImageButton，对选择颜色界面进行布局。
+在layout文件夹中，新建布局文件note_color.xml，垂直线性布局放置5个ImageButton，对选择颜色的界面进行布局。
 ```properties
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -564,7 +565,7 @@ public class MyCursorAdapter extends SimpleCursorAdapter {
 </resources>
 ```
 #### 3.9
-创建NoteColor.java类用来选择颜色。
+创建NoteColor.java类，用来选择笔记颜色。
 ```properties
 package com.example.android.notepad;
 
@@ -641,7 +642,7 @@ public class NoteColor extends Activity {
     }
 }
 ```
-并在清单文件AndroidManifest.xml中添加NoteColor活动，以及给页面换个主题，把黑色换成白色，在AndroidManifest.xml中的Activity中添加。
+并在清单文件AndroidManifest.xml中添加NoteColor活动，以及给页面换个主题，把黑色换成白色，在AndroidManifest.xml中的Activity中添加，白色能更好的体现笔记颜色更换的效果。
 ```properties
         <activity
             android:name=".NoteColor"
@@ -688,7 +689,7 @@ public class NoteColor extends Activity {
 
 ### 4. `笔记排序`
 #### 4.1
-在menu文件夹的菜单文件list_options_menu.xml中添加新item。
+在menu文件夹的菜单文件list_options_menu.xml中添加新的item。
 ```properties
     <item
         android:id="@+id/menu_sort"
@@ -709,7 +710,7 @@ public class NoteColor extends Activity {
     </item>
 ```
 #### 4.2
-在NoteList.java类中的onOptionsItemSelected方法的switch中添加新case。
+在NoteList.java类中的onOptionsItemSelected方法的switch中添加新的case选项。
 ```properties
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -781,7 +782,7 @@ public class NoteColor extends Activity {
     }
 ```
 #### 4.3
-因为排序会多次用到adapter，cursor等，所以将他们定义在函数外。
+因为排序会多次用到adapter，cursor等，所以把他们定义在外面。
 ```properties
     private MyCursorAdapter adapter;
     private Cursor cursor;
@@ -789,15 +790,15 @@ public class NoteColor extends Activity {
     private int[] viewIDs = {android.R.id.text1, R.id.text2};
 ```
 #### `完成效果如下`
-创建时间排序
+根据创建时间排序
 
 ![Alt Text](./06.png)
 
-修改时间排序
+根据修改时间排序
 
 ![Alt Text](./07.png)
 
-颜色排序
+根据颜色排序
 
 ![Alt Text](./08.png)
 
